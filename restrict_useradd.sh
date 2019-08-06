@@ -22,7 +22,10 @@ uid=$(($1))
 gid=$(($2))
 username=$3
 if [ "$4" != "" ]; then
-    skelarg="-k $4"
+    groupadd="-G $4"
+fi
+if [ "$5" != "" ]; then
+    skelarg="-k $5"
 fi
 
 if [ $uid -eq 0 ]; then
@@ -32,5 +35,6 @@ elif [ $gid -eq 0 ]; then
     echo "Refusing to use a gid of 0"
     exit 1
 else
-    useradd -N -g $gid -m $skelarg -o -u $uid "$username"
+    useradd -N -g $gid $groupadd -m $skelarg -o -u $uid "$username"
 fi
+

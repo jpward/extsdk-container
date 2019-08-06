@@ -32,6 +32,9 @@ parser.add_argument("--gid", type=int,
                     help="gid to use for the initial login group for the "
                          "user. If not specified, the gid of WORKDIR is used")
 
+parser.add_argument("--groupadd",default='',
+                    help='Add additional groups using comma separated list of group_name:gid')
+
 parser.add_argument("--skel", default="",
                     help="directory to use as the skeleton for user's home")
 
@@ -48,6 +51,16 @@ parser.add_argument("args", default="", nargs=argparse.REMAINDER)
 
 args = parser.parse_args()
 
+groups = ""
+if args.groupadd:
+    # Add each group requested
+    for g in args.groupadd.split(","):
+        gname, gid = g.split(":")
+        groups += gname+","
+        cmd = "sudo restrict_groupadd.sh {} {}".format(gid, gname)
+        subprocess.check_call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
+    groups = groups[0:-1]
+
 if not args.uid:
     # Use the owner of the workdir for the uid if the uid isn't specified
     st = os.stat(args.workdir)
@@ -61,8 +74,8 @@ if not args.gid:
 cmd = "sudo restrict_groupadd.sh {} {}".format(args.gid, args.username)
 subprocess.check_call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
 
-cmd = "sudo restrict_useradd.sh {} {} {} {}".format(args.uid, args.gid,
-                                                    args.username, args.skel)
+cmd = "sudo restrict_useradd.sh {} {} {} {}".format(args.uid, args.gid, 
+                                                    args.username, groups, args.skel)
 subprocess.check_call(cmd.split(), stdout=sys.stdout, stderr=sys.stderr)
 
 usercmd = "{} {}".format(args.cmd, " ".join(args.args))
@@ -70,3 +83,4 @@ usercmd = "{} {}".format(args.cmd, " ".join(args.args))
 cmd = "sudo -E -H -u {} ".format(args.username)
 cmd = (cmd + usercmd).split()
 os.execvp(cmd[0], cmd)
+
