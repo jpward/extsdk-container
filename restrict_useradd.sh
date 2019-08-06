@@ -35,12 +35,10 @@ elif [ $gid -eq 0 ]; then
     echo "Refusing to use a gid of 0"
     exit 1
 else
-    useradd -N -g $gid $groupadd -m $skelarg -o -u $uid "$username"
+    makehome="-m"
+    if [ -d /home/$username ]; then makehome=""; fi
+    useradd -N -g $gid $groupadd $makehome $skelarg -o -u $uid "$username"
     #Make sure home directory for user is owned by user.
-    if [ "$5" != "" ]; then
-        chown $uid:$gid $5
-    else
-        chown $uid:$gid /home/$username
-    fi
+    chown $uid:$gid /home/$username
 fi
 
