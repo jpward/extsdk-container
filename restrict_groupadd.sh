@@ -25,5 +25,9 @@ if [ $gid -eq 0 ]; then
     echo "Refusing to use a gid of 0"
     exit 1
 else
+    #Deleting group if it already exists since we want to use gid from host,
+    #  this is not perfect since files could get orphaned and
+    #  gid we want could already exist as another group
+    groupdel -f "$groupname" 
     groupadd -o -g $gid "$groupname"
 fi
