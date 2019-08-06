@@ -36,5 +36,11 @@ elif [ $gid -eq 0 ]; then
     exit 1
 else
     useradd -N -g $gid $groupadd -m $skelarg -o -u $uid "$username"
+    #Make sure home directory for user is owned by user.
+    if [ "$5" != "" ]; then
+        chown $uid:$gid $5
+    else
+        chown $uid:$gid /home/$username
+    fi
 fi
 
