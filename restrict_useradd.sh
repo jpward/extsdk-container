@@ -38,7 +38,6 @@ else
     makehome="-m"
     if [ -d /home/$username ]; then makehome=""; fi
     grep -q "^$username:" /etc/passwd && userdel $username && echo "User $username already existed, removing..."
-    grep -q "^$username:" /etc/group && groupdel $username && echo "Group $username already existed, removing..."
     useradd -N -g $gid $groupadd $makehome $skelarg -o -u $uid "$username"
     #Make sure home directory for user is owned by user.
     chown $uid:$gid /home/$username
