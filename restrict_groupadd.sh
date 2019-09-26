@@ -28,6 +28,6 @@ else
     #Deleting group if it already exists since we want to use gid from host,
     #  this is not perfect since files could get orphaned and
     #  gid we want could already exist as another group
-    grep -q "^$groupname:" /etc/group  && groupdel "$groupname"
+    grep -q "^$groupname:" /etc/group  && groupdel "$groupname" || echo "Could not remove group: $groupname"
     groupadd -o -g $gid "$groupname"
 fi
